@@ -91,7 +91,7 @@ static void drawHowToUse (GtkWidget *widget)
     GdkPixbuf *pix;
     GError *err = NULL;
     /* Create pixbuf */
-    pix = gdk_pixbuf_new_from_file("/home/michal/mojeProgramy/graphDrawingCPP_v1/howToUse/moUse.png", &err);
+    pix = gdk_pixbuf_new_from_file("moUse.png", &err);
     if(err)
     {
         printf("Error : %s\n", err->message);
