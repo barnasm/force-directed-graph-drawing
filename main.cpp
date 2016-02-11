@@ -2,7 +2,6 @@
 Michał Barnaś
 Uniwersytet Wrocławski
 WdPC 2015/16
-gcc -std=c99  main.c -o mainGraph `pkg-config gtk+-3.0 --cflags` `pkg-config gtk+-3.0 --libs` -lm
 */
 
 #include <gtk/gtk.h>
