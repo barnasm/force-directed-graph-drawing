@@ -11,98 +11,81 @@ GraphClass::GraphClass(int *h, int *w, int *vg, int *eg, double *r)
     //edges    = new std::vector<EdgeClass*>;
 }
 
-VertexClass* GraphClass::newVertex(double x, double y, int i){
-    //printf("NewVertex\n");
-    VertexClass *v = new VertexClass(x, y, i);
-    v->color.randColor();
+void GraphClass::deleteEdge(std::shared_ptr<EdgeClass> edge){
+    for(unsigned int i = 0; i < edges->size(); i++){
+        if(edges->at(i) == edge){
 
-    return v;
-}
-
-EdgeClass* GraphClass::newEdge(VertexClass *a, VertexClass *b, int w, int i){
-    //printf("NewEdge\n");
-    EdgeClass *e = new EdgeClass(a, b, w, i);
-    e->color.randColor();
-    return e;
-}
-
-void GraphClass::deleteEdge(EdgeClass *edge){
-    for(unsigned int i = 0; i < edges.size(); i++){
-        if(edges[i] == edge){
-            free(edges[i]);
-            edges.erase(edges.begin()+i);
+            edges->erase(edges->begin()+i);
             return;
         }
     }
 }
 
 void GraphClass::addNewVertex(double x, double y){
-    vertices.push_back(newVertex(x, y, vertices.size()));
+    vertices->push_back(std::make_shared<VertexClass> (x, y, vertices->size()));
 }
 
-EdgeClass* GraphClass::addNewEdge(VertexClass *a, VertexClass *b){
+std::shared_ptr<EdgeClass> GraphClass::addNewEdge(std::shared_ptr<VertexClass> a, std::shared_ptr<VertexClass> b){
     if(a == b || a == NULL || b == NULL) return NULL;
-    edges.push_back(newEdge( a, b, 0, edges.size()));
-    return edges[edges.size()-1];
+    edges->push_back(std::make_shared <EdgeClass>( a, b, 0, edges->size()));
+    return edges->at(edges->size()-1);
 }
 
-void GraphClass::deleteVertex(VertexClass *vertex){
-    for(unsigned int i = 0; i < edges.size(); i++){
-        if(edges[i]->A == vertex || edges[i]->B == vertex){
-            free(edges[i]);
-            edges.erase(edges.begin()+i);
+void GraphClass::deleteVertex(std::shared_ptr<VertexClass> vertex){
+    for(unsigned int i = 0; i < edges->size(); i++){
+        if(edges->at(i)->A == vertex || edges->at(i)->B == vertex){
+            edges->erase(edges->begin()+i);
             i--;
         }
     }
-    for(unsigned int i = 0; i < vertices.size(); i++){
-        if(vertices[i] == vertex){
-            vertices[i]->neighbors.clear();
-            free(vertices[i]);
-            vertices.erase(vertices.begin()+i);
+    for(unsigned int i = 0; i < vertices->size(); i++){
+        if(vertices->at(i) == vertex){
+            vertices->at(i)->neighbors.clear();
+            vertices->erase(vertices->begin()+i);
             return;
         }
     }
 }
 
-VertexClass* GraphClass::findNearestVertex(double x, double y){
-    if(vertices.size() == 0) return NULL;
+std::shared_ptr<VertexClass> GraphClass::findNearestVertex(double x, double y){
+    if(vertices->size() == 0) return NULL;
 
-    VertexClass *v = new VertexClass(x, y);
-    VertexClass *vRet = vertices[0];
+    auto v = std::make_shared<VertexClass> (x, y);
+    auto vRet = vertices->at(0);
     MDtype minDist = getDistanceBetweenVertex(v, vRet);
-    for(unsigned int i = 0; i < vertices.size(); i++){
-        if(getDistanceBetweenVertex(v, vertices[i]) < minDist){
-            minDist = getDistanceBetweenVertex(v, vertices[i]);
-            vRet = vertices[i];
+    for(unsigned int i = 0; i < vertices->size(); i++){
+        if(getDistanceBetweenVertex(v, vertices->at(i)) < minDist){
+            minDist = getDistanceBetweenVertex(v, vertices->at(i));
+            vRet = vertices->at(i);
         }
     }
-    free(v);
     if (minDist > (*RADIUS-*RADIUS/1.5) + 10) return NULL;
     return vRet;
 }
 
-EdgeClass* GraphClass::findNearestEdge(double x, double y){
-    if(edges.size() == 0) return NULL;
+std::shared_ptr<EdgeClass> GraphClass::findNearestEdge(double x, double y){
+    if(edges->size() == 0) return NULL;
 
-    VertexClass *v = new VertexClass(x, y);
-    EdgeClass *eRet = edges[0];
+    auto v = std::make_shared<VertexClass> (x, y);
+    auto eRet = edges->at(0);
     MDtype minDist = getDistanceBetweenEdge(v, eRet);
-    for(unsigned int i = 0; i < edges.size(); i++){
-        if(getDistanceBetweenEdge(v, edges[i]) < minDist && isBetween(edges[i], v)){
-            minDist = getDistanceBetweenEdge(v, edges[i]);
-            eRet = edges[i];
+    for(unsigned int i = 0; i < edges->size(); i++){
+        if(getDistanceBetweenEdge(v, edges->at(i)) < minDist && isBetween(edges->at(i), v)){
+            minDist = getDistanceBetweenEdge(v, edges->at(i));
+            eRet = edges->at(i);
         }
     }
 
     if(!isBetween(eRet, v) || minDist > 10){
-        free(v);
         return NULL;
     }
-    free(v);
     return eRet;
 }
 
 void GraphClass::generateGraph(){
+    vertices = std::make_shared <std::vector< std::shared_ptr <VertexClass> >>();
+    edges    = std::make_shared <std::vector< std::shared_ptr <EdgeClass> >>();
+
     for(int i = 0; i < *VERTICES_GEN; i++){
         addNewVertex((double)(rand() % *WIDTH), (double)(rand() % *HEIGHT));
     }
@@ -114,40 +97,35 @@ void GraphClass::generateGraph(){
             i--;
             continue;
         }
-        vertices[a]->neighbors.push_back(vertices[b]);
-        vertices[b]->neighbors.push_back(vertices[a]);
+        vertices->at(a)->neighbors.push_back(vertices->at(b));
+        vertices->at(b)->neighbors.push_back(vertices->at(a));
 
-        //edges.push_back(newEdge( vertices[a], vertices[b], w, i));
-        addNewEdge(vertices[a], vertices[b]);
+        //edges->push_back(newEdge( vertices->at(a), vertices->at(b), w, i));
+        addNewEdge(vertices->at(a), vertices->at(b));
     }
-    thisVertex = vertices[0];
-    thisEdge = edges[0];
+    thisVertex = vertices->at(0);
+    thisEdge = edges->at(0);
 }
 
-void GraphClass::printGraphData(){
+std::ostream& operator << (std::ostream& out, const GraphClass &g){
     int s = 3;
-    printf("Vertices\n");
-    for(unsigned int i = 0; i < vertices.size(); i++){
-        printf("%*u) Neighbors: %lu  id: %i\n", 3, i, vertices[i]->neighbors.size(), vertices[i]->id);
-        for(unsigned int j = 0; j < vertices[i]->neighbors.size(); j++){
-            printf("%*i) Neighbors: %lu id: %d\n", 8, j, vertices[i]->neighbors[j]->neighbors.size(), vertices[i]->neighbors[j]->id);
-        }printf("\n");
+    out << "Vertices\n";
+    for(unsigned int i = 0; i < g.vertices->size(); i++){
+        out << i << ") " <<
+               " Neighbors: " << g.vertices->at(i)->neighbors.size() <<
+               " id: " << g.vertices->at(i)->id << std::endl;
+        for(unsigned int j = 0; j < g.vertices->at(i)->neighbors.size(); j++){
+            out << "" << j << ") " <<
+                   "Neighbors: " << g.vertices->at(i)->neighbors[j]->neighbors.size() <<
+                   " id: " <<  g.vertices->at(i)->neighbors[j]->id << std::endl;
+        }
+        out << "\n";
     }
 
-    printf("\n\nEdges\n");
-    for(unsigned int i = 0; i < edges.size(); i++){
-        printf("%*i) %*i--->%*i\n", s, i, s, edges[i]->A->id, s, edges[i]->B->id);
-    }
-}
 
-void GraphClass::freeGraph(){
-    for(unsigned int i = 0; i < vertices.size(); i++){
-        vertices[i]->neighbors.clear();
-        free(vertices[i]);
+    out << "\n\nEdges\n";
+    for(unsigned int i = 0; i < g.edges->size(); i++){
+        //printf("%*i) %*lu--->%*lu\n", s, i, s, edges->at(i)->A->id, s, edges->at(i)->B->id);
     }
-    for(unsigned int i = 0; i < edges.size(); i++){
-        free(edges[i]);
-    }
-    vertices.clear();
-    edges.clear();
+    return out;
 }

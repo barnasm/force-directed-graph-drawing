@@ -10,20 +10,20 @@ ForceDirectedGraphDrawing::ForceDirectedGraphDrawing(int *h, int *w, MDtype *gr,
     SPEED = s;
     MAX_DISPLACEMENT = mxd;
 }
-void ForceDirectedGraphDrawing::clearForces(GraphClass *g)
+void ForceDirectedGraphDrawing::clearForces(std::shared_ptr<GraphClass>g)
 {
-    for(unsigned int i = 0; i < g->vertices.size(); ++i){
-        g->vertices[i]->xForce = 0;
-        g->vertices[i]->yForce = 0;
+    for(unsigned int i = 0; i < g->vertices->size(); ++i){
+        g->vertices->at(i)->xForce = 0;
+        g->vertices->at(i)->yForce = 0;
     }
 }
 
-void ForceDirectedGraphDrawing::computeAttractiveForces(GraphClass *g)
+void ForceDirectedGraphDrawing::computeAttractiveForces(std::shared_ptr<GraphClass>g)
 {
-    MDtype k = 0.1 * sqrt((*HEIGHT * *WIDTH) / (1.0 + g->vertices.size()));
-    for(unsigned int i = 0; i < g->edges.size(); ++i){
-        VertexClass* v1 = g->edges[i]->A;
-        VertexClass* v2 = g->edges[i]->B;
+    MDtype k = 0.1 * sqrt((*HEIGHT * *WIDTH) / (1.0 + g->vertices->size()));
+    for(unsigned int i = 0; i < g->edges->size(); ++i){
+        std::shared_ptr<VertexClass> v1 = g->edges->at(i)->A;
+        std::shared_ptr<VertexClass> v2 = g->edges->at(i)->B;
         MDtype distance = getDistanceBetweenVertex(v1, v2);
         MDtype attractiveF = distance*distance / k * *ATTRACTION;
         if (distance > 0) {
@@ -35,14 +35,14 @@ void ForceDirectedGraphDrawing::computeAttractiveForces(GraphClass *g)
     }
 }
 
-void ForceDirectedGraphDrawing::computeRepulsiveForces(GraphClass *g)
+void ForceDirectedGraphDrawing::computeRepulsiveForces(std::shared_ptr<GraphClass> g)
 {
-    MDtype k = sqrt((*WIDTH * *HEIGHT) / (1.0 + g->vertices.size()));
-    for(unsigned int i = 0; i < g->vertices.size(); ++i){
-        for(unsigned int j = 0; j < g->vertices.size(); ++j){
+    MDtype k = sqrt((*WIDTH * *HEIGHT) / (1.0 + g->vertices->size()));
+    for(unsigned int i = 0; i < g->vertices->size(); ++i){
+        for(unsigned int j = 0; j < g->vertices->size(); ++j){
             if(i != j){
-                VertexClass* v1 = g->vertices[i];
-                VertexClass* v2 = g->vertices[j];
+                std::shared_ptr<VertexClass> v1 = g->vertices->at(i);
+                std::shared_ptr<VertexClass> v2 = g->vertices->at(j);
                 MDtype distance = getDistanceBetweenVertex(v1, v2);
                 if (distance > 0) {
                     MDtype repulsiveF = k*k / distance * *REPULSION;
@@ -55,11 +55,11 @@ void ForceDirectedGraphDrawing::computeRepulsiveForces(GraphClass *g)
 }
 
 
-void ForceDirectedGraphDrawing::computeGravityForces(GraphClass *g)
+void ForceDirectedGraphDrawing::computeGravityForces(std::shared_ptr<GraphClass> g)
 {
-    MDtype k = sqrt((*WIDTH * *HEIGHT) / (1.0 + g->vertices.size()));
-    for(unsigned int i = 0; i < g->vertices.size(); ++i){
-        VertexClass* v = g->vertices[i];
+    MDtype k = sqrt((*WIDTH * *HEIGHT) / (1.0 + g->vertices->size()));
+    for(unsigned int i = 0; i < g->vertices->size(); ++i){
+        std::shared_ptr<VertexClass>  v = g->vertices->at(i);
         MDtype x = (MDtype)v->x - *WIDTH/2.0;
         MDtype y = (MDtype)v->y - *HEIGHT/2.0;
         MDtype distance = sqrt(x*x + y*y);
@@ -70,10 +70,10 @@ void ForceDirectedGraphDrawing::computeGravityForces(GraphClass *g)
 
 }
 
-void ForceDirectedGraphDrawing::moveVertices(GraphClass *g, bool moveThisVertex){
-    for (unsigned int i = 0; i<g->vertices.size(); ++i) {
-        if(!moveThisVertex && g->thisVertex == g->vertices[i]) continue;
-        VertexClass* v = g->vertices[i];
+void ForceDirectedGraphDrawing::moveVertices(std::shared_ptr<GraphClass> g, bool moveThisVertex){
+    for (unsigned int i = 0; i<g->vertices->size(); ++i) {
+        if(!moveThisVertex && g->thisVertex == g->vertices->at(i)) continue;
+        std::shared_ptr<VertexClass>  v = g->vertices->at(i);
 
         v->xForce *= *SPEED;
         v->yForce *= *SPEED;
@@ -87,7 +87,7 @@ void ForceDirectedGraphDrawing::moveVertices(GraphClass *g, bool moveThisVertex)
     }
 }
 
-void ForceDirectedGraphDrawing::computeIteration(GraphClass *g, bool moveThisVertex)
+void ForceDirectedGraphDrawing::computeIteration(std::shared_ptr<GraphClass>g, bool moveThisVertex)
 {
     if(g == NULL) return;
 

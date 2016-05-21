@@ -6,7 +6,8 @@
 #include "graphclass.h"
 #include "getdistance.h"
 
-#define MDtype double
+//#define MDtype double
+using MDtype = double;
 
 class ForceDirectedGraphDrawing: public GetDistance
 {
@@ -19,14 +20,14 @@ private:
     MDtype *REPULSION;
     MDtype *ATTRACTION;
 
-    void clearForces(GraphClass *g);
-    void computeAttractiveForces(GraphClass *g);
-    void computeRepulsiveForces(GraphClass *g);
-    void computeGravityForces(GraphClass *g);
-    void moveVertices(GraphClass *g, bool moveThisVertex);
+    void clearForces(std::shared_ptr<GraphClass> g);
+    void computeAttractiveForces(std::shared_ptr<GraphClass> g);
+    void computeRepulsiveForces(std::shared_ptr<GraphClass> g);
+    void computeGravityForces(std::shared_ptr<GraphClass> g);
+    void moveVertices(std::shared_ptr<GraphClass> g, bool moveThisVertex);
 public:
     ForceDirectedGraphDrawing(int *h, int *w, MDtype *gr, MDtype *rep, MDtype *att, MDtype *s, MDtype *mxd);
-    void computeIteration(GraphClass *g, bool moveThisVertex);
+    void computeIteration(std::shared_ptr<GraphClass> g, bool moveThisVertex);
 };
 
 #endif // FORCEDIRECTEDGRAPHDRAWING_H

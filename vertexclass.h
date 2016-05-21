@@ -3,25 +3,28 @@
 
 #include "color.h"
 #include <vector>
+#include <memory>
 
-#define MDtype double
+//#define MDtype double
+using MDtype = double;
 
 class VertexClass: public Color
 {
 public:
     //char name[10];
-    int id;
+    size_t id;
     double x;
     double y;
 
     MDtype xForce;
     MDtype yForce;
 
-    Color color;
+    std::shared_ptr <Color> color;
 
-    std::vector<VertexClass*> neighbors;
+    std::vector< std::shared_ptr <VertexClass> > neighbors;
 
-    VertexClass(double x = 0, double y = 0, int id = -1);
+    VertexClass(double x = 0, double y = 0, size_t id = -1);
+    ~VertexClass();
 };
 
 #endif // VERTEXCLASS_H

@@ -6,6 +6,12 @@ Color::Color(char r, char g, char b)
     green = g;
     blue = b;
 }
+
+Color::Color()
+{
+  randColor();
+}
+
 void Color::randColor(){
     red = (rand() % 256);
     green = (rand() % 256);

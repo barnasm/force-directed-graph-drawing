@@ -11,7 +11,8 @@ private:
 
 public:
 
-    Color(char r=0, char g=0, char b=0);
+    Color(char r, char g, char b);
+    Color();
     void randColor();
     double getRed();
     double getGreen();

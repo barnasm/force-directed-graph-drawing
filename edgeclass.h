@@ -3,21 +3,21 @@
 
 #include "color.h"
 #include "vertexclass.h"
+#include <memory>
 
 class EdgeClass: public Color
 {
 public:
     int weight;
-    //char *name;
-    int id;
-    Color color;
+    size_t id;
+    std::shared_ptr<Color> color;
 
-    VertexClass *A;
-    VertexClass *B;
+    std::shared_ptr <VertexClass> A;
+    std::shared_ptr <VertexClass> B;
 
 
-    EdgeClass(VertexClass *a = NULL, VertexClass *b = NULL, int w = 0, int i = -1);
-
+    EdgeClass(std::shared_ptr <VertexClass> a = nullptr, std::shared_ptr <VertexClass> b = nullptr, int w = 0, size_t i = -1);
+    ~EdgeClass();
 };
 
 #endif // EDGECLASS_H

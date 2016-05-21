@@ -1,18 +1,20 @@
 /*
 Michał Barnaś
 Uniwersytet Wrocławski
-WdPC 2015/16
+Programowanie Obiektowe 2016
 */
 
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
-//#include <string>
+#include <iostream>
 #include <cstring>
+#include <memory>
 #include "forcedirectedgraphdrawing.h"
+#include <thread>
 
-#define MDtype double
+using MDtype = double;
 
 double EDGE_WIDTH = 3;
 double RADIUS = 30;
@@ -63,15 +65,17 @@ static gboolean start_timer = FALSE;
 GtkWidget *drawing_area;
 
 static void activate();
+static gboolean timeOut(gpointer data);
 
-GraphClass *myGraph;
+std::shared_ptr<GraphClass> myGraph;
 bool MOVE_THIS_VERTEX = TRUE;
 
 int main (int argc, char **argv)
 {
     srand(time(NULL));
-    myGraph = new GraphClass(&HEIGHT, &WIDTH, &VERTEX_GEN, &EDGE_GEN, &RADIUS);
+    myGraph = std::make_shared<GraphClass> (&HEIGHT, &WIDTH, &VERTEX_GEN, &EDGE_GEN, &RADIUS);
     myGraph->generateGraph();
+    std::cout << myGraph;
 
     gtk_init(&argc, &argv);
 
@@ -82,47 +86,27 @@ int main (int argc, char **argv)
     activate();
     gtk_main();
 
-    myGraph->freeGraph();
     return 0;
 }
 
-static void drawHowToUse (GtkWidget *widget)
-{
-    GdkPixbuf *pix;
-    GError *err = NULL;
-    /* Create pixbuf */
-    pix = gdk_pixbuf_new_from_file("moUse.png", &err);
-    if(err)
-    {
-        printf("Error : %s\n", err->message);
-        g_error_free(err);
-    }
-
-    cairo_t *cr;
-    cr = cairo_create (layerMessage);
-    gdk_cairo_set_source_pixbuf(cr, pix, 100, 0);
-    cairo_paint(cr);
-    cairo_destroy (cr);
-    gtk_widget_queue_draw_area (widget, 100, 0, 1000, 300);
-}
 
 
-static void drawEdge (GtkWidget *widget, EdgeClass *e){
+static void drawEdge (GtkWidget *widget, std::shared_ptr <EdgeClass> e){
     cairo_t *cr;
     cr = cairo_create (layerEdges);
 
     cairo_set_line_width (cr, EDGE_WIDTH);
     //cairo_set_source_rgba (cr, 255.0/255.0, 67.0/255.0, 0.0/255.0, 1);
-    cairo_set_source_rgba (cr, e->color.getRed()   -0.2,
-                               e->color.getGreen() -0.2,
-                               e->color.getBlue()  -0.2, 1);
+    cairo_set_source_rgba (cr, e->color->getRed()   -0.2,
+                               e->color->getGreen() -0.2,
+                               e->color->getBlue()  -0.2, 1);
     cairo_set_line_cap  (cr, CAIRO_LINE_CAP_ROUND);
     cairo_move_to (cr, e->A->x, e->A->y);
     cairo_line_to (cr, e->B->x, e->B->y);
     cairo_stroke (cr);
     cairo_destroy (cr);
 }
-static void drawVertex (GtkWidget *widget, VertexClass* v )
+static void drawVertex (GtkWidget *widget, std::shared_ptr <VertexClass> v )
 {
     cairo_t *cr;
     cairo_pattern_t *pat;
@@ -130,9 +114,9 @@ static void drawVertex (GtkWidget *widget, VertexClass* v )
 
     pat = cairo_pattern_create_radial (v->x, v->y, RADIUS/100.0,
                                        v->x, v->y, RADIUS);
-    cairo_pattern_add_color_stop_rgba (pat, 0, (double)v->color.getRed(),
-                                               (double)v->color.getGreen(),
-                                               (double)v->color.getBlue(), 1);
+    cairo_pattern_add_color_stop_rgba (pat, 0, (double)v->color->getRed(),
+                                               (double)v->color->getGreen(),
+                                               (double)v->color->getBlue(), 1);
     cairo_pattern_add_color_stop_rgba (pat, 1, 0, 0, 0, 1);
     cairo_set_source (cr, pat);
     //cairo_arc (cr, 128, 128, 76, 0, 2 * G_PI);
@@ -172,9 +156,10 @@ static void clearSurface ()
     cairo_set_source (cr, pat);
     cairo_paint (cr);
     cairo_destroy (cr);
+    cairo_pattern_destroy (pat);
 }
 
-void computeGraphPos(GraphClass *g){
+void computeGraphPos(std::shared_ptr<GraphClass> g){
     if(g == NULL) return;
 
     for(int i = 0; i < JUMP; ++i)
@@ -183,16 +168,16 @@ void computeGraphPos(GraphClass *g){
         FDGD_Alg.computeIteration(g, MOVE_THIS_VERTEX);
     }
 }
-void drawGraph(GraphClass *g){
-    if(g == NULL) return;
+void drawGraph(std::shared_ptr<GraphClass>g){
+    if(g == nullptr) return;
     //clearSurface();
-    for(unsigned int i = 0; i < g->vertices.size(); i++){
+    for(unsigned int i = 0; i < g->vertices->size(); i++){
         //myGraph->thisVertex = g->graphV[i];
-        drawVertex(drawing_area, g->vertices[i]);
+        drawVertex(drawing_area, g->vertices->at(i));
     }
-    for(unsigned int i = 0; i < g->edges.size(); i++){
+    for(unsigned int i = 0; i < g->edges->size(); i++){
         //myGraph->thisEdge = g->graphE[i];
-        drawEdge(drawing_area, g->edges[i]);
+        drawEdge(drawing_area, g->edges->at(i));
     }
 }
 void preDrawGraph(GtkButton *button, GtkWidget* widget){
@@ -200,16 +185,14 @@ void preDrawGraph(GtkButton *button, GtkWidget* widget){
     gtk_widget_queue_draw(widget);
     if(continue_timer || button)
     {
-        computeGraphPos(myGraph);
+      	computeGraphPos(myGraph);
     }
+    //    std::thread th1(&computeGraphPos, std::ref(myGraph));
+
     drawGraph(myGraph);
+    //    th1.join();
 }
 
-static gboolean timeOut(gpointer data)
-{
-    preDrawGraph(GTK_BUTTON(data), drawing_area);
-    return continue_timer;
-}
 static void startTimer ()
 {
     if(!start_timer)
@@ -218,6 +201,16 @@ static void startTimer ()
         start_timer = TRUE;
         continue_timer = TRUE;
     }
+}
+static gboolean timeOut(gpointer data)
+{
+    if(!start_timer){
+        startTimer();
+        return FALSE;
+    }
+
+    preDrawGraph(GTK_BUTTON(data), drawing_area);
+    return continue_timer;
 }
 static void onOffTimer (bool on)
 {
@@ -231,10 +224,38 @@ static void onOffTimer (bool on)
     }
 }
 
+static void drawHowToUse (GtkWidget *widget)
+{
+    GdkPixbuf *pix;
+    GError *err = NULL;
+    /* Create pixbuf */
+    pix = gdk_pixbuf_new_from_file("moUse.png", &err);
+    if(err)
+    {
+        printf("Error : %s\n", err->message);
+        GtkWidget *dialog = gtk_message_dialog_new (NULL,
+                                         GTK_DIALOG_USE_HEADER_BAR,
+                                         GTK_MESSAGE_ERROR,
+                                         GTK_BUTTONS_CLOSE,
+                                         "Error: “%s”",
+                                         err->message);
+        gtk_dialog_run (GTK_DIALOG (dialog));
+        gtk_widget_destroy (dialog);
+
+        g_error_free(err);
+        return;
+    }
+    onOffTimer(!continue_timer);
+    cairo_t *cr;
+    cr = cairo_create (layerMessage);
+    gdk_cairo_set_source_pixbuf(cr, pix, 100, 0);
+    cairo_paint(cr);
+    cairo_destroy (cr);
+    gtk_widget_queue_draw_area (widget, 100, 0, 1000, 300);
+}
+
 void buttonClicked(GtkWidget *button, gpointer widget){
     if(strcmp(gtk_widget_get_name(button), NameButtonHowToUse) == 0){
-        onOffTimer(!continue_timer);
-
         drawHowToUse(drawing_area);
         return;
     }
@@ -255,10 +276,9 @@ void buttonClicked(GtkWidget *button, gpointer widget){
 
 
     if(strcmp(gtk_widget_get_name(button), NameButtonGenNewGraph) == 0) {
-        myGraph->freeGraph();
         myGraph->generateGraph();
-        myGraph->thisVertex = myGraph->vertices[0];
-        myGraph->thisEdge = myGraph->edges[0];
+        myGraph->thisVertex = myGraph->vertices->at(0);
+        myGraph->thisEdge = myGraph->edges->at(0);
         //printGraphData(myGraph);
     }
     drawGraph(myGraph);
@@ -277,6 +297,8 @@ void dataWidgetChanged(GtkWidget *widget, gpointer object){
         preDrawGraph(NULL, drawing_area);
         return;
     }else if(strcmp(str, NameSpinTimerSleep) == 0){
+        //g_source_remove(timerId);
+        start_timer = false;
         TIMER_SLEEP = (int)floor(gtk_adjustment_get_value (gtk_spin_button_get_adjustment ((GtkSpinButton*)object)));
         return;
     }
@@ -420,7 +442,7 @@ static gboolean buttonPressEvent (GtkWidget *widget, GdkEventButton *event, gpoi
         }
         else{
             myGraph->thisEdge = myGraph->addNewEdge(myGraph->thisVertex,
-                                   new VertexClass(event->x, event->y));
+                                                    std::make_shared<VertexClass>(event->x, event->y));
 
             myGraph->thisVertex = myGraph->thisEdge->B;
         }
@@ -449,7 +471,7 @@ static gboolean buttonReleaseEvent (GtkWidget *widget, GdkEventButton *event, gp
     {
         myGraph->thisEdge->B = myGraph->findNearestVertex(event->x, event->y);
         if(myGraph->thisEdge->A == NULL || myGraph->thisEdge->B == NULL)
-            myGraph->deleteEdge(myGraph->edges[myGraph->edges.size()-1]);
+            myGraph->deleteEdge(myGraph->edges->at(myGraph->edges->size()-1));
     }
     return TRUE;
 }
@@ -592,8 +614,8 @@ static void activate ()//GtkApplication *app, gpointer user_data
 
 
     gtk_widget_show_all(window);
-    timerId = g_timeout_add(TIMER_SLEEP, timeOut, NULL);
-    continue_timer = TRUE;
-    start_timer = TRUE;
-    //startTimer();
+    //timerId = g_timeout_add(TIMER_SLEEP, timeOut, NULL);
+    //continue_timer = TRUE;
+    //start_timer = TRUE;
+    startTimer();
 }

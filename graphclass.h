@@ -6,9 +6,12 @@
 #include "vertexclass.h"
 #include "edgeclass.h"
 #include <vector>
+#include <iostream>
+#include <memory>
 #include "getdistance.h"
 
-#define MDtype double
+//#define MDtype double
+using MDtype = double;
 
 class GraphClass:private GetDistance
 {
@@ -19,29 +22,26 @@ private:
     int *EDGES_GEN;
     double *RADIUS;
 
-    VertexClass *newVertex(double x, double y, int i);
-    EdgeClass *newEdge(VertexClass *a, VertexClass *b, int w, int i);
-
 public:
-    VertexClass *thisVertex;
-    EdgeClass *thisEdge;
-    std::vector<VertexClass*> vertices;
-    std::vector<EdgeClass*> edges;
+    std::shared_ptr <VertexClass> thisVertex;
+    std::shared_ptr <EdgeClass> thisEdge;
+    std::shared_ptr <std::vector< std::shared_ptr <VertexClass> > > vertices;
+    std::shared_ptr <std::vector< std::shared_ptr <EdgeClass> > > edges;
 
 
     GraphClass(int *h, int *w, int *vg, int* eg, double *r);
     void addNewVertex(double x = 0, double y = 0);
-    EdgeClass *addNewEdge(VertexClass *a, VertexClass *b);
+    std::shared_ptr<EdgeClass> addNewEdge(std::shared_ptr<VertexClass> a, std::shared_ptr<VertexClass> b);
 
-    void deleteVertex(VertexClass *vertex);
-    void deleteEdge(EdgeClass *edge);
+    void deleteVertex(std::shared_ptr<VertexClass> vertex);
+    void deleteEdge(std::shared_ptr<EdgeClass> edge);
 
-    VertexClass* findNearestVertex(double x, double y);
-    EdgeClass* findNearestEdge(double x, double y);
+    std::shared_ptr<VertexClass> findNearestVertex(double x, double y);
+    std::shared_ptr<EdgeClass> findNearestEdge(double x, double y);
 
     void generateGraph();
     void printGraphData();
-    void freeGraph();
+    friend std::ostream& operator << (std::ostream& out, const GraphClass &g);
 };
 
 #endif // GRAPH_H
