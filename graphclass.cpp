@@ -21,8 +21,9 @@ void GraphClass::deleteEdge(std::shared_ptr<EdgeClass> edge){
     }
 }
 
-void GraphClass::addNewVertex(double x, double y){
+std::shared_ptr<VertexClass> GraphClass::addNewVertex(double x, double y){
     vertices->push_back(std::make_shared<VertexClass> (x, y, vertices->size()));
+    return vertices->at(vertices->size()-1);
 }
 
 std::shared_ptr<EdgeClass> GraphClass::addNewEdge(std::shared_ptr<VertexClass> a, std::shared_ptr<VertexClass> b){
@@ -105,27 +106,29 @@ void GraphClass::generateGraph(){
     }
     thisVertex = vertices->at(0);
     thisEdge = edges->at(0);
+    //std::cout << *this << std::endl;
 }
 
 std::ostream& operator << (std::ostream& out, const GraphClass &g){
-    int s = 3;
-    out << "Vertices\n";
+    int s = 4;
+    out << "Vertices: " << g.vertices->size() << std::endl;
     for(unsigned int i = 0; i < g.vertices->size(); i++){
-        out << i << ") " <<
-               " Neighbors: " << g.vertices->at(i)->neighbors.size() <<
-               " id: " << g.vertices->at(i)->id << std::endl;
+        out << "id: ";
+        out.width(s);
+        out << g.vertices->at(i)->id <<
+               " Connections: " << g.vertices->at(i)->neighbors.size() << std::endl;
+
         for(unsigned int j = 0; j < g.vertices->at(i)->neighbors.size(); j++){
-            out << "" << j << ") " <<
-                   "Neighbors: " << g.vertices->at(i)->neighbors[j]->neighbors.size() <<
-                   " id: " <<  g.vertices->at(i)->neighbors[j]->id << std::endl;
+            out.width(3*s);
+            out <<  g.vertices->at(i)->neighbors[j]->id << std::endl;
+
         }
-        out << "\n";
     }
 
 
-    out << "\n\nEdges\n";
-    for(unsigned int i = 0; i < g.edges->size(); i++){
-        //printf("%*i) %*lu--->%*lu\n", s, i, s, edges->at(i)->A->id, s, edges->at(i)->B->id);
-    }
+//    out << "\n\nEdges\n";
+//    for(unsigned int i = 0; i < g.edges->size(); i++){
+//        printf("%*i) %*lu--->%*lu\n", s, i, s, edges->at(i)->A->id, s, edges->at(i)->B->id);
+//    }
     return out;
 }

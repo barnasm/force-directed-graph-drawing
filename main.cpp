@@ -75,7 +75,7 @@ int main (int argc, char **argv)
     srand(time(NULL));
     myGraph = std::make_shared<GraphClass> (&HEIGHT, &WIDTH, &VERTEX_GEN, &EDGE_GEN, &RADIUS);
     myGraph->generateGraph();
-    std::cout << myGraph;
+    //std::cout << *myGraph;
 
     gtk_init(&argc, &argv);
 
