@@ -12,7 +12,9 @@ private:
 public:
 
     Color(char r, char g, char b);
+    Color(const Color &c);
     Color();
+
     void randColor();
     double getRed();
     double getGreen();

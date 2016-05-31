@@ -30,6 +30,9 @@ public:
 
 
     GraphClass(int *h, int *w, int *vg, int* eg, double *r);
+    GraphClass(const GraphClass &g);
+    void operator = (const GraphClass &g);
+
     std::shared_ptr<VertexClass> addNewVertex(double x = 0, double y = 0);
     std::shared_ptr<EdgeClass> addNewEdge(std::shared_ptr<VertexClass> a, std::shared_ptr<VertexClass> b);
 

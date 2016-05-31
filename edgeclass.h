@@ -17,6 +17,7 @@ public:
 
 
     EdgeClass(std::shared_ptr <VertexClass> a = nullptr, std::shared_ptr <VertexClass> b = nullptr, int w = 0, size_t i = -1);
+    EdgeClass(const EdgeClass &e);
     ~EdgeClass();
 };
 

@@ -12,6 +12,7 @@ using MDtype = double;
 class ForceDirectedGraphDrawing: public GetDistance
 {
 private:
+    //GraphClass newG;
     int *HEIGHT;
     int *WIDTH;
     MDtype *SPEED;

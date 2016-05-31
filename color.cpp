@@ -7,6 +7,10 @@ Color::Color(char r, char g, char b)
     blue = b;
 }
 
+Color::Color(const Color &c):
+    red(0), green(c.green), blue(c.blue)
+{}
+
 Color::Color()
 {
   randColor();

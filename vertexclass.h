@@ -24,6 +24,7 @@ public:
     std::vector< std::shared_ptr <VertexClass> > neighbors;
 
     VertexClass(double x = 0, double y = 0, size_t id = -1);
+    VertexClass(const VertexClass &v);
     ~VertexClass();
 };
 

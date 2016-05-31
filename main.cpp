@@ -72,8 +72,16 @@ bool MOVE_THIS_VERTEX = TRUE;
 
 int main (int argc, char **argv)
 {
-    srand(time(NULL));
+    //GraphClass graph(&HEIGHT, &WIDTH, &VERTEX_GEN, &EDGE_GEN, &RADIUS);
+    //graph.generateGraph();
+    //GraphClass graph2(graph);
+    //GraphClass graph2 = graph;
+    //graph = graph3;
+    //std::cout << graph.vertices << "  " << graph2.vertices << std::endl;
+
+    srand(time(nullptr));
     myGraph = std::make_shared<GraphClass> (&HEIGHT, &WIDTH, &VERTEX_GEN, &EDGE_GEN, &RADIUS);
+    //myGraph = std::make_shared<GraphClass> (graph);
     myGraph->generateGraph();
     //std::cout << *myGraph;
 
@@ -160,7 +168,7 @@ static void clearSurface ()
 }
 
 void computeGraphPos(std::shared_ptr<GraphClass> g){
-    if(g == NULL) return;
+    if(g == nullptr) return;
 
     for(int i = 0; i < JUMP; ++i)
     {
@@ -197,7 +205,7 @@ static void startTimer ()
 {
     if(!start_timer)
     {
-        timerId = g_timeout_add(TIMER_SLEEP, timeOut, NULL);
+        timerId = g_timeout_add(TIMER_SLEEP, timeOut, nullptr);
         start_timer = TRUE;
         continue_timer = TRUE;
     }
@@ -219,7 +227,7 @@ static void onOffTimer (bool on)
         continue_timer = on;
         if(continue_timer)
         {
-            timerId = g_timeout_add(TIMER_SLEEP, timeOut, NULL);
+            timerId = g_timeout_add(TIMER_SLEEP, timeOut, nullptr);
         }
     }
 }
@@ -227,13 +235,13 @@ static void onOffTimer (bool on)
 static void drawHowToUse (GtkWidget *widget)
 {
     GdkPixbuf *pix;
-    GError *err = NULL;
+    GError *err = nullptr;
     /* Create pixbuf */
     pix = gdk_pixbuf_new_from_file("moUse.png", &err);
     if(err)
     {
         printf("Error : %s\n", err->message);
-        GtkWidget *dialog = gtk_message_dialog_new (NULL,
+        GtkWidget *dialog = gtk_message_dialog_new (nullptr,
                                          GTK_DIALOG_USE_HEADER_BAR,
                                          GTK_MESSAGE_ERROR,
                                          GTK_BUTTONS_CLOSE,
@@ -277,8 +285,8 @@ void buttonClicked(GtkWidget *button, gpointer widget){
 
     if(strcmp(gtk_widget_get_name(button), NameButtonGenNewGraph) == 0) {
         myGraph->generateGraph();
-        myGraph->thisVertex = myGraph->vertices->at(0);
-        myGraph->thisEdge = myGraph->edges->at(0);
+        //myGraph->thisVertex = myGraph->vertices->at(0);
+        //myGraph->thisEdge = myGraph->edges->at(0);
         //printGraphData(myGraph);
     }
     drawGraph(myGraph);
@@ -290,11 +298,11 @@ void dataWidgetChanged(GtkWidget *widget, gpointer object){
 //left menu
     if(strcmp(str, NameSpinVertexRadius) == 0){
         RADIUS = (int)floor(gtk_adjustment_get_value (gtk_spin_button_get_adjustment ((GtkSpinButton*)object)));
-        preDrawGraph(NULL, drawing_area);
+        preDrawGraph(nullptr, drawing_area);
         return;
     }else if(strcmp(str, NameSpinEdgeWidth) == 0){
         EDGE_WIDTH = (int)floor(gtk_adjustment_get_value (gtk_spin_button_get_adjustment ((GtkSpinButton*)object)));
-        preDrawGraph(NULL, drawing_area);
+        preDrawGraph(nullptr, drawing_area);
         return;
     }else if(strcmp(str, NameSpinTimerSleep) == 0){
         //g_source_remove(timerId);
@@ -411,19 +419,18 @@ static gboolean drawLayers (GtkWidget *widget, cairo_t *cr, gpointer data)
 
 static gboolean buttonPressEvent (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-    if (layerVertices == NULL)
+    if (layerVertices == nullptr)
         return FALSE;
 
     //onOffTimer(false);
     myGraph->thisVertex = myGraph->findNearestVertex(event->x, event->y);
     if (event->button == GDK_BUTTON_PRIMARY)
     {
-        MOVE_THIS_VERTEX = FALSE;
-
-        if(myGraph->thisVertex == NULL){
-            //preDrawGraph(NULL, drawing_area);
+        if(myGraph->thisVertex == nullptr){
+            //preDrawGraph(nullptr, drawing_area);
             return FALSE;
         }
+        MOVE_THIS_VERTEX = FALSE;
 
         myGraph->thisVertex->x = event->x;
         myGraph->thisVertex->y = event->y;
@@ -432,12 +439,12 @@ static gboolean buttonPressEvent (GtkWidget *widget, GdkEventButton *event, gpoi
     else if (event->button == GDK_BUTTON_MIDDLE)
     {
 
-        if(myGraph->thisVertex == NULL){
+        if(myGraph->thisVertex == nullptr){
             myGraph->thisEdge = myGraph->findNearestEdge(event->x, event->y);
-            if(myGraph->thisEdge == NULL)
+            if(myGraph->thisEdge == nullptr)
                 return FALSE;
             myGraph->deleteEdge(myGraph->thisEdge);
-            preDrawGraph(NULL, drawing_area);
+            preDrawGraph(nullptr, drawing_area);
             return FALSE;
         }
         else{
@@ -449,48 +456,48 @@ static gboolean buttonPressEvent (GtkWidget *widget, GdkEventButton *event, gpoi
     }
     else if (event->button == GDK_BUTTON_SECONDARY)
     {
-        if(myGraph->thisVertex == NULL){
+        if(myGraph->thisVertex == nullptr){
             myGraph->addNewVertex(event->x, event->y);
         }
         else{
             myGraph->deleteVertex(myGraph->thisVertex);
         }
-        preDrawGraph(NULL, drawing_area);
+        preDrawGraph(nullptr, drawing_area);
     }
     return TRUE;
 }
 static gboolean buttonReleaseEvent (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-    if (layerVertices == NULL || myGraph->thisVertex == NULL)
+    if (layerVertices == nullptr || myGraph->thisVertex == nullptr)
         return FALSE;
 
     //onOffTimer(TRUE);
     MOVE_THIS_VERTEX = TRUE;
 
-    if (event->button == GDK_BUTTON_MIDDLE && myGraph->thisEdge != NULL)
+    if (event->button == GDK_BUTTON_MIDDLE && myGraph->thisEdge != nullptr)
     {
         myGraph->thisEdge->B = myGraph->findNearestVertex(event->x, event->y);
-        if(myGraph->thisEdge->A == NULL || myGraph->thisEdge->B == NULL)
+        if(myGraph->thisEdge->A == nullptr || myGraph->thisEdge->B == nullptr)
             myGraph->deleteEdge(myGraph->edges->at(myGraph->edges->size()-1));
     }
     return TRUE;
 }
 static gboolean motionNotifyEvent (GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-    if (layerVertices == NULL || myGraph->thisVertex == NULL)
+    if (layerVertices == nullptr || myGraph->thisVertex == nullptr)
         return FALSE;
 
     if (event->state & GDK_BUTTON1_MASK){
         myGraph->thisVertex->x = event->x;
         myGraph->thisVertex->y = event->y;
     }
-    else if (event->state & GDK_BUTTON2_MASK && myGraph->thisEdge != NULL){
+    else if (event->state & GDK_BUTTON2_MASK && myGraph->thisEdge != nullptr){
         myGraph->thisVertex->x = event->x;
         myGraph->thisVertex->y = event->y;
     }
 
     if(!continue_timer)
-        preDrawGraph(NULL, widget);
+        preDrawGraph(nullptr, widget);
 
     return TRUE;
 }
@@ -519,7 +526,7 @@ static void activate ()//GtkApplication *app, gpointer user_data
     gtk_window_set_title (GTK_WINDOW (window), "Graph");
     gtk_container_set_border_width (GTK_CONTAINER (window), 8);
 
-    g_signal_connect (G_OBJECT(window), "destroy", G_CALLBACK (close_window), NULL);
+    g_signal_connect (G_OBJECT(window), "destroy", G_CALLBACK (close_window), nullptr);
 
     GtkWidget *boxMain = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_container_add(GTK_CONTAINER(window), boxMain);
@@ -532,7 +539,7 @@ static void activate ()//GtkApplication *app, gpointer user_data
     drawing_area = gtk_drawing_area_new ();
     gtk_widget_set_size_request (drawing_area, WIDTH, HEIGHT);
 
-    GtkWidget *frame = gtk_frame_new (NULL);
+    GtkWidget *frame = gtk_frame_new (nullptr);
     gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_IN);
     gtk_container_add (GTK_CONTAINER (boxMain), frame);
     gtk_container_add (GTK_CONTAINER (frame), drawing_area);
@@ -572,12 +579,12 @@ static void activate ()//GtkApplication *app, gpointer user_data
 
 //center
     g_signal_connect (drawing_area, "draw", G_CALLBACK (drawLayers), drawing_area);
-    g_signal_connect (drawing_area,"configure-event", G_CALLBACK (configureLayers), NULL);
+    g_signal_connect (drawing_area,"configure-event", G_CALLBACK (configureLayers), nullptr);
 
 
-    g_signal_connect (drawing_area, "motion-notify-event", G_CALLBACK (motionNotifyEvent), NULL);
-    g_signal_connect (drawing_area, "button-press-event",  G_CALLBACK (buttonPressEvent),  NULL);
-    g_signal_connect (drawing_area, "button-release-event",G_CALLBACK (buttonReleaseEvent),NULL);
+    g_signal_connect (drawing_area, "motion-notify-event", G_CALLBACK (motionNotifyEvent), nullptr);
+    g_signal_connect (drawing_area, "button-press-event",  G_CALLBACK (buttonPressEvent),  nullptr);
+    g_signal_connect (drawing_area, "button-release-event",G_CALLBACK (buttonReleaseEvent),nullptr);
 
     gtk_widget_set_events (drawing_area, gtk_widget_get_events (drawing_area) | GDK_BUTTON_PRESS_MASK
                                                                               | GDK_BUTTON_RELEASE_MASK
@@ -614,7 +621,7 @@ static void activate ()//GtkApplication *app, gpointer user_data
 
 
     gtk_widget_show_all(window);
-    //timerId = g_timeout_add(TIMER_SLEEP, timeOut, NULL);
+    //timerId = g_timeout_add(TIMER_SLEEP, timeOut, nullptr);
     //continue_timer = TRUE;
     //start_timer = TRUE;
     startTimer();

@@ -89,11 +89,12 @@ void ForceDirectedGraphDrawing::moveVertices(std::shared_ptr<GraphClass> g, bool
 
 void ForceDirectedGraphDrawing::computeIteration(std::shared_ptr<GraphClass>g, bool moveThisVertex)
 {
-    if(g == NULL) return;
+    if(g == nullptr) return;
 
     clearForces(g);
     computeAttractiveForces(g);
     computeRepulsiveForces(g);
     computeGravityForces(g);
     moveVertices(g, moveThisVertex);
+
 }
