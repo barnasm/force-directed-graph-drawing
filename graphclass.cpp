@@ -65,7 +65,7 @@ void GraphClass::deleteVertex(std::shared_ptr<VertexClass> vertex){
     }
     for(unsigned int i = 0; i < vertices->size(); i++){
         if(vertices->at(i) == vertex){
-            vertices->at(i)->neighbors.clear();
+            //vertices->at(i)->neighbors.clear();
             vertices->erase(vertices->begin()+i);
             return;
         }
@@ -122,8 +122,8 @@ void GraphClass::generateGraph(){
             i--;
             continue;
         }
-        vertices->at(a)->neighbors.push_back(vertices->at(b));
-        vertices->at(b)->neighbors.push_back(vertices->at(a));
+        //vertices->at(a)->neighbors.push_back(vertices->at(b));
+        //vertices->at(b)->neighbors.push_back(vertices->at(a));
 
         //edges->push_back(newEdge( vertices->at(a), vertices->at(b), w, i));
         addNewEdge(vertices->at(a), vertices->at(b));
@@ -139,6 +139,7 @@ std::ostream& operator << (std::ostream& out, const GraphClass &g){
     for(unsigned int i = 0; i < g.vertices->size(); i++){
         out << "id: ";
         out.width(s);
+#if 0
         out << g.vertices->at(i)->id <<
                " Connections: " << g.vertices->at(i)->neighbors.size() << std::endl;
 
@@ -147,6 +148,7 @@ std::ostream& operator << (std::ostream& out, const GraphClass &g){
             out <<  g.vertices->at(i)->neighbors[j]->id << std::endl;
 
         }
+#endif
     }
 
 

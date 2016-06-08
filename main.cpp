@@ -237,9 +237,10 @@ static void drawHowToUse (GtkWidget *widget)
     GdkPixbuf *pix;
     GError *err = nullptr;
     /* Create pixbuf */
-    pix = gdk_pixbuf_new_from_file("moUse.png", &err);
+    pix = gdk_pixbuf_new_from_file("howToUse/moUse.png", &err);
     if(err)
     {
+    	#if 1
         printf("Error : %s\n", err->message);
         GtkWidget *dialog = gtk_message_dialog_new (nullptr,
                                          GTK_DIALOG_USE_HEADER_BAR,
@@ -251,6 +252,7 @@ static void drawHowToUse (GtkWidget *widget)
         gtk_widget_destroy (dialog);
 
         g_error_free(err);
+        #endif
         return;
     }
     onOffTimer(!continue_timer);
@@ -285,6 +287,8 @@ void buttonClicked(GtkWidget *button, gpointer widget){
 
     if(strcmp(gtk_widget_get_name(button), NameButtonGenNewGraph) == 0) {
         myGraph->generateGraph();
+        startTimer();
+        //onOffTimer(true);
         //myGraph->thisVertex = myGraph->vertices->at(0);
         //myGraph->thisEdge = myGraph->edges->at(0);
         //printGraphData(myGraph);
