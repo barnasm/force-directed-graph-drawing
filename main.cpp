@@ -445,7 +445,8 @@ static gboolean buttonPressEvent (GtkWidget *widget, GdkEventButton *event, gpoi
     else if (event->button == GDK_BUTTON_MIDDLE and released == true)
       {
 	released = false;
-        if(myGraph->thisVertex == nullptr){
+	
+	if(myGraph->thisVertex == nullptr){
 	  myGraph->thisEdge = myGraph->findNearestEdge(event->x, event->y);
 	  if(myGraph->thisEdge == nullptr)
 	    return FALSE;
@@ -501,9 +502,10 @@ static gboolean motionNotifyEvent (GtkWidget *widget, GdkEventMotion *event, gpo
         myGraph->thisVertex->x = event->x;
         myGraph->thisVertex->y = event->y;
     }
-    else if (event->state & GDK_BUTTON2_MASK && myGraph->thisEdge != nullptr){
-        myGraph->thisVertex->x = event->x;
-        myGraph->thisVertex->y = event->y;
+    else if (event->state & GDK_BUTTON2_MASK &&
+	     myGraph->thisEdge != nullptr){
+      myGraph->thisEdge->B->x = event->x;
+      myGraph->thisEdge->B->y = event->y;
     }
 
     if(!continue_timer)
