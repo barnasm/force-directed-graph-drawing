@@ -3,13 +3,13 @@ CFLAGS= -c -std=c++11 -Wall -Werror
 
 TARGET = graph
 
-CONFIG += link_pkgconfig
-PKGCONFIG += gtk+-3.0
+#CONFIG += link_pkgconfig
+#PKGCONFIG += gtk+-3.0
 
-CPPFLAGS="-I/opt/gtk/include"
-LDFLAGS="-L/opt/gtk/lib"
-PKG_CONFIG_PATH="/opt/gtk/lib/pkgconfig"
-export CPPFLAGS LDFLAGS PKG_CONFIG_PATH
+#CPPFLAGS="-I/opt/gtk/include"
+#LDFLAGS="-L/opt/gtk/lib"
+#PKG_CONFIG_PATH="/opt/gtk/lib/pkgconfig"
+#export CPPFLAGS LDFLAGS PKG_CONFIG_PATH
 
 X_CFLAGS= -std=c++11 -Werror `pkg-config --cflags gtk+-3.0`
 X_LDFLAGS=`pkg-config --libs gtk+-3.0` -lm

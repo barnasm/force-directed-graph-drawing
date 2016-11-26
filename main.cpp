@@ -3,7 +3,7 @@ Michał Barnaś
 Uniwersytet Wrocławski
 Programowanie Obiektowe 2016
 */
-
+#include <gdk/gdk.h> 
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,6 +69,7 @@ static gboolean timeOut(gpointer data);
 
 std::shared_ptr<GraphClass> myGraph;
 bool MOVE_THIS_VERTEX = TRUE;
+bool released = true; //remove it to "pin" vertex by double click
 
 int main (int argc, char **argv)
 {
@@ -87,13 +88,13 @@ int main (int argc, char **argv)
 
     gtk_init(&argc, &argv);
 
-    HEIGHT = gdk_screen_get_height(gdk_screen_get_default()) - 100;
-    WIDTH  = gdk_screen_get_width(gdk_screen_get_default())  - 400;
+    //HEIGHT = gdk_screen_get_height(gdk_screen_get_default()) - 100;
+    //WIDTH  = gdk_screen_get_width (gdk_screen_get_default()) - 400;
     MAX_DISPLACEMENT = sqrt(WIDTH*HEIGHT);
-
+    
     activate();
-    gtk_main();
 
+    gtk_main();
     return 0;
 }
 
@@ -172,6 +173,7 @@ void computeGraphPos(std::shared_ptr<GraphClass> g){
 
     for(int i = 0; i < JUMP; ++i)
     {
+        //ForceDirectedGraphDrawing::computeIteration(g, MOVE_THIS_VERTEX);
         ForceDirectedGraphDrawing FDGD_Alg(&HEIGHT, &WIDTH, &GRAVITY, &REPULSION, &ATTRACTION, &SPEED, &MAX_DISPLACEMENT);
         FDGD_Alg.computeIteration(g, MOVE_THIS_VERTEX);
     }
@@ -440,34 +442,34 @@ static gboolean buttonPressEvent (GtkWidget *widget, GdkEventButton *event, gpoi
         myGraph->thisVertex->y = event->y;
         //preDrawGraph((GtkButton*)widget, widget);
     }
-    else if (event->button == GDK_BUTTON_MIDDLE)
-    {
-
+    else if (event->button == GDK_BUTTON_MIDDLE and released == true)
+      {
+	released = false;
         if(myGraph->thisVertex == nullptr){
-            myGraph->thisEdge = myGraph->findNearestEdge(event->x, event->y);
-            if(myGraph->thisEdge == nullptr)
-                return FALSE;
-            myGraph->deleteEdge(myGraph->thisEdge);
-            preDrawGraph(nullptr, drawing_area);
-            return FALSE;
+	  myGraph->thisEdge = myGraph->findNearestEdge(event->x, event->y);
+	  if(myGraph->thisEdge == nullptr)
+	    return FALSE;
+	  myGraph->deleteEdge(myGraph->thisEdge);
+	  preDrawGraph(nullptr, drawing_area);
+	  return FALSE;
         }
         else{
-            myGraph->thisEdge = myGraph->addNewEdge(myGraph->thisVertex,
-                                                    std::make_shared<VertexClass>(event->x, event->y));
-
-            myGraph->thisVertex = myGraph->thisEdge->B;
+	  myGraph->thisEdge = myGraph->addNewEdge(myGraph->thisVertex,
+						  std::make_shared<VertexClass>(event->x, event->y));
+	  
+	  myGraph->thisVertex = myGraph->thisEdge->B;
         }
-    }
+      }
     else if (event->button == GDK_BUTTON_SECONDARY)
-    {
+      {
         if(myGraph->thisVertex == nullptr){
-            myGraph->addNewVertex(event->x, event->y);
+	  myGraph->addNewVertex(event->x, event->y);
         }
         else{
-            myGraph->deleteVertex(myGraph->thisVertex);
+	  myGraph->deleteVertex(myGraph->thisVertex);
         }
         preDrawGraph(nullptr, drawing_area);
-    }
+      }
     return TRUE;
 }
 static gboolean buttonReleaseEvent (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
@@ -480,9 +482,12 @@ static gboolean buttonReleaseEvent (GtkWidget *widget, GdkEventButton *event, gp
 
     if (event->button == GDK_BUTTON_MIDDLE && myGraph->thisEdge != nullptr)
     {
-        myGraph->thisEdge->B = myGraph->findNearestVertex(event->x, event->y);
-        if(myGraph->thisEdge->A == nullptr || myGraph->thisEdge->B == nullptr)
-            myGraph->deleteEdge(myGraph->edges->at(myGraph->edges->size()-1));
+      released = true;
+      myGraph->thisEdge->B = myGraph->findNearestVertex(event->x, event->y);
+      if(myGraph->thisEdge->A == nullptr ||
+	 myGraph->thisEdge->B == nullptr ||
+	 myGraph->thisEdge->A == myGraph->thisEdge->B)
+	myGraph->deleteEdge(myGraph->edges->at(myGraph->edges->size()-1));
     }
     return TRUE;
 }
@@ -531,10 +536,9 @@ static void activate ()//GtkApplication *app, gpointer user_data
     gtk_container_set_border_width (GTK_CONTAINER (window), 8);
 
     g_signal_connect (G_OBJECT(window), "destroy", G_CALLBACK (close_window), nullptr);
-
+       
     GtkWidget *boxMain = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_container_add(GTK_CONTAINER(window), boxMain);
-
     //left menu
     GtkWidget *boxMenuL = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_box_pack_start(GTK_BOX(boxMain), boxMenuL, TRUE, TRUE, 0);

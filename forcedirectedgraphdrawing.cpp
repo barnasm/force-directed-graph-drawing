@@ -1,6 +1,7 @@
 #include "forcedirectedgraphdrawing.h"
 
-ForceDirectedGraphDrawing::ForceDirectedGraphDrawing(int *h, int *w, MDtype *gr, MDtype *rep, MDtype *att, MDtype *s, MDtype *mxd)
+ForceDirectedGraphDrawing::
+ForceDirectedGraphDrawing(int *h, int *w, MDtype *gr, MDtype *rep, MDtype *att, MDtype *s, MDtype *mxd)
 {
     HEIGHT = h;
     WIDTH = w;
