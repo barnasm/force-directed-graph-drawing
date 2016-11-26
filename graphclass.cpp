@@ -50,7 +50,8 @@ std::shared_ptr<VertexClass> GraphClass::addNewVertex(double x, double y){
     return vertices->at(vertices->size()-1);
 }
 
-std::shared_ptr<EdgeClass> GraphClass::addNewEdge(std::shared_ptr<VertexClass> a, std::shared_ptr<VertexClass> b){
+std::shared_ptr<EdgeClass> GraphClass::
+addNewEdge(std::shared_ptr<VertexClass> a, std::shared_ptr<VertexClass> b){
     if(a == b || a == nullptr || b == nullptr) return nullptr;
     edges->push_back(std::make_shared <EdgeClass>( a, b, 0, edges->size()));
     return edges->at(edges->size()-1);

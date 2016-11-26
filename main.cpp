@@ -474,22 +474,23 @@ static gboolean buttonPressEvent (GtkWidget *widget, GdkEventButton *event, gpoi
 }
 static gboolean buttonReleaseEvent (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-    if (layerVertices == nullptr || myGraph->thisVertex == nullptr)
-        return FALSE;
-
-    //onOffTimer(TRUE);
-    MOVE_THIS_VERTEX = TRUE;
-
-    if (event->button == GDK_BUTTON_MIDDLE && myGraph->thisEdge != nullptr)
+  released = true;
+  
+  if (layerVertices == nullptr || myGraph->thisVertex == nullptr)
+    return FALSE;
+  
+  //onOffTimer(TRUE);
+  MOVE_THIS_VERTEX = TRUE;
+  
+  if (event->button == GDK_BUTTON_MIDDLE && myGraph->thisEdge != nullptr)
     {
-      released = true;
       myGraph->thisEdge->B = myGraph->findNearestVertex(event->x, event->y);
       if(myGraph->thisEdge->A == nullptr ||
 	 myGraph->thisEdge->B == nullptr ||
 	 myGraph->thisEdge->A == myGraph->thisEdge->B)
 	myGraph->deleteEdge(myGraph->edges->at(myGraph->edges->size()-1));
     }
-    return TRUE;
+  return TRUE;
 }
 static gboolean motionNotifyEvent (GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
