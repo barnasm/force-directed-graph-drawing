@@ -89,7 +89,7 @@ void ForceDirectedGraphDrawing::moveVertices(std::shared_ptr<GraphClass> g, bool
 }
 
 void ForceDirectedGraphDrawing::computeIteration(std::shared_ptr<GraphClass>g, bool moveThisVertex)
-{
+{//vertex shaking probably becouse different levers of formulas
     if(g == nullptr) return;
 
     clearForces(g);

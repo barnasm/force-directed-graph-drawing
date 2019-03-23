@@ -4,14 +4,14 @@ GetDistance::GetDistance()
 {
 }
 MDtype GetDistance::getDx(std::shared_ptr<VertexClass> v1, std::shared_ptr<VertexClass> v2 ){
-  if(fabs(v2->x - v1->x) < 0.0001)
+  if(fabs(v2->x - v1->x) < 0.0001 && &v1 != &v2)
     printf("dx: \n%lf \n%lf \n%lf\n\n", v2->x, v1->x, fabs(v2->x - v1->x));
   return v2->x - v1->x;
 }
 
 
 MDtype GetDistance::getDy(std::shared_ptr<VertexClass> v1, std::shared_ptr<VertexClass> v2){
-  if(fabs(v2->x - v1->x) < 0.0001)
+  if(fabs(v2->x - v1->x) < 0.0001 && &v1 != &v2)
     printf("dy: \n%lf \n%lf \n%lf\n\n", v2->x, v1->x, fabs(v2->x - v1->x));
   return v2->y - v1->y;
 }
@@ -43,23 +43,53 @@ MDtype GetDistance::getDistanceBetweenEdge(std::shared_ptr<VertexClass> p, std::
 
 MDtype GetDistance::
 whichSide(std::shared_ptr<VertexClass>A, std::shared_ptr<VertexClass> B, std::shared_ptr<VertexClass>p){
-    return A->y*B->x + B->y*p->x + p->y*A->x - p->y*B->x - A->y*p->x - B->y*A->x;
+  if(fabs(A->y*B->x + B->y*p->x) < 0.0001)
+    printf("which side1\n");
+  if(fabs(A->y*B->x + B->y*p->x + p->y*A->x) < 0.0001)
+    printf("which side2\n");
+  if(fabs(A->y*B->x + B->y*p->x + p->y*A->x - p->y*B->x) < 0.0001)
+    printf("which side3\n");
+  if(fabs(A->y*B->x + B->y*p->x + p->y*A->x - p->y*B->x - A->y*p->x) < 0.0001)
+    printf("which side4\n");
+  if(fabs(A->y*B->x + B->y*p->x + p->y*A->x - p->y*B->x - A->y*p->x - B->y*A->x) < 0.0001)
+    printf("which side5: %lf\n",
+	   A->y*B->x + B->y*p->x + p->y*A->x - p->y*B->x - A->y*p->x - B->y*A->x);
+  
+  return A->y*B->x + B->y*p->x + p->y*A->x - p->y*B->x - A->y*p->x - B->y*A->x;
 }
 
 std::shared_ptr<VertexClass> GetDistance::
 projectionPointOntoLine(std::shared_ptr<EdgeClass> line, std::shared_ptr<VertexClass>p){
-    MDtype u =
-      ((p->x - line->A->x)*(line->B->x - line->A->x) +
-       (p->y - line->A->y)*(line->B->y - line->A->y)) /
-      ((line->A->x - line->B->x)*(line->A->x - line->B->x) +
-       (line->A->y - line->B->y)*(line->A->y - line->B->y));
-
-//    return std::shared_ptr<VertexClass> {
-//        new VertexClass(((line->B->x - line->A->x) * u) + line->A->x,
-//                       ((line->B->y - line->A->y) * u) + line->A->y)
-//    };
-    return std::make_shared<VertexClass>(((line->B->x - line->A->x) * u) + line->A->x,
-                                         ((line->B->y - line->A->y) * u) + line->A->y);
+  MDtype u =
+    ((p->x - line->A->x)*(line->B->x - line->A->x) +
+     (p->y - line->A->y)*(line->B->y - line->A->y)) /
+    ((line->A->x - line->B->x)*(line->A->x - line->B->x) +
+     (line->A->y - line->B->y)*(line->A->y - line->B->y));
+  
+  if(fabs(p->x - line->A->x) < 0.0001)
+    printf("projection on line");
+  if(fabs(line->B->x - line->A->x) < 0.0001)
+    printf("projection on line");
+  if(fabs(p->y - line->A->y) < 0.0001)
+    printf("projection on line");
+  if(fabs(line->B->y - line->A->y) < 0.0001)
+    printf("projection on line");
+  if(fabs(line->B->y - line->A->y) < 0.0001)
+    printf("projection on line");
+  if(fabs(((p->x - line->A->x)*(line->B->x - line->A->x) +
+	   (p->y - line->A->y)*(line->B->y - line->A->y))) < 0.0001)
+    printf("projection on line");
+  if(fabs(line->A->x - line->B->x) < 0.0001)
+    printf("projection on line");
+  if(fabs(line->A->y - line->B->y) < 0.0001)
+    printf("projection on line");
+  if(fabs(((line->B->x - line->A->x) * u) + line->A->x) < 0.0001)
+    printf("projection on line");
+  if(fabs(((line->B->y - line->A->y) * u) + line->A->y) < 0.0001)
+    printf("projection on line");
+  
+  return std::make_shared<VertexClass>(((line->B->x - line->A->x) * u) + line->A->x,
+				       ((line->B->y - line->A->y) * u) + line->A->y);
 }
 
 bool GetDistance::isBetween(std::shared_ptr<EdgeClass> edge, std::shared_ptr<VertexClass>v){
